@@ -5,11 +5,13 @@ date: "2/8/2018"
 output:
   html_document:
     code_folding: hide
+    toc: true
+    toc_float: true
 ---
 
-```{r setup, include=FALSE, message=F, warning=F}
+```{r setup, include=FALSE}
 # knit options
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, message=F, warning=F)
 
 # packages
 library(tidyverse)
@@ -31,13 +33,18 @@ dwc_csv      <- "data/dwc.csv"
 
 ## Objectives
 
-Dataset `Combined Till99 & Yaq98 Ferraro Benthic Macrofauna.xlsx` from Christina Folger <Folger.Christina@epa.gov>.
+Dataset [`Combined Till99 & Yaq98 Ferraro Benthic Macrofauna.xlsx`](https://github.com/bbest/ioos-bio-tidyr/raw/gh-pages/data/raw/Combined%20Till99%20%26%20Yaq98%20Ferraro%20Benthic%20Macrofauna.xlsx) from Christina Folger <Folger.Christina@epa.gov>.
 
 Based on [OBIS - Manual - Darwin Core](http://www.iobis.org/manual/darwincore/), at a minimum we need to:
 
 1. Get lat/lon from UTM coordinates.
 1. Get WoRMS ID from taxonomic name.
-1. Create DarwinCore record.
+1. Create table with required DarwinCore columns.
+
+This document is an Rmarkdown HTML file, which knits chunks of R code with formatted text (in markdown format): 
+
+* [Rmarkdown - Introduction](https://rmarkdown.rstudio.com/lesson-1.html)
+* [Rmarkdown - HTML Document](https://rmarkdown.rstudio.com/html_document_format.html)
 
 ## Read from Excel
 
@@ -54,7 +61,7 @@ d <- read_xlsx(
 datatable(d)
 ```
 
-## Show stations on map
+## Show stations on a map
 
 ```{r}
 # search UTM 10N at spatialreference.org
