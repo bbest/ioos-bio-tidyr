@@ -1,0 +1,151 @@
+---
+title: "Benthos Species"
+author: "Ben Best"
+date: "2/8/2018"
+output:
+  html_document:
+    code_folding: hide
+---
+
+```{r setup, include=FALSE, message=F, warning=F}
+# knit options
+knitr::opts_chunk$set(echo = TRUE)
+
+# packages
+library(tidyverse)
+library(fs)
+library(here)
+library(readxl)
+library(DT)
+library(sf)
+library(mapview)
+library(taxize)
+library(glue)
+
+# paths
+d_xlsx       <- "data/raw/Combined Till99 & Yaq98 Ferraro Benthic Macrofauna.xlsx"
+stations_csv <- "data/stations.csv"
+taxa_csv     <- "data/taxa.csv"
+dwc_csv      <- "data/dwc.csv"
+```
+
+## Objectives
+
+Dataset `Combined Till99 & Yaq98 Ferraro Benthic Macrofauna.xlsx` from Christina Folger <Folger.Christina@epa.gov>.
+
+Based on [OBIS - Manual - Darwin Core](http://www.iobis.org/manual/darwincore/), at a minimum we need to:
+
+1. Get lat/lon from UTM coordinates.
+1. Get WoRMS ID from taxonomic name.
+1. Create DarwinCore record.
+
+## Read from Excel
+
+```{r}
+d <- read_xlsx(
+  d_xlsx, sheet = 1,
+  # Expecting logical in L1299 / R1299C12: got 'Polychaeta'
+  col_types = c(rep("guess", 11), "text", "guess", "guess"))
+
+# class(d)
+# summary(spp_station)
+# View(spp_station)
+
+datatable(d)
+```
+
+## Show stations on map
+
+```{r}
+# search UTM 10N at spatialreference.org
+stations <- d %>%
+  group_by(StationID, State, Estuary, Habitat, Station, Northing, Easting) %>%
+  summarize() %>%
+  #  nest()
+  st_as_sf(coords = c("Easting", "Northing"), crs = 32610) %>%
+  st_transform(crs=4326) %>%
+  mutate(
+    lon = st_coordinates(geometry)[,"X"],
+    lat = st_coordinates(geometry)[,"Y"])
+
+mapview(stations)
+```
+
+## Match species to WoRMS id
+
+- [rOpenSci | taxize tutorial](https://ropensci.org/tutorials/taxize_tutorial/)
+
+```{r}
+if (!file_exists(taxa_csv)){
+
+  taxa <- d %>%
+    group_by(GenusSpecies) %>%
+    summarize() %>%
+    #mutate(
+    #  wormsid  = get_wormsid(GenusSpecies))
+    mutate(
+      query = str_replace(GenusSpecies, " sp", "")) %>%
+    mutate(
+      wormsid  = get_wormsid(GenusSpecies, ask = FALSE))  
+  
+  write_csv(taxa, taxa_csv)
+} else {
+  taxa <- read_csv(taxa_csv, col_type = cols())
+}
+
+#taxa$wormsid <- get_wormsid(taxa$GenusSpecies)
+#taxa$wormsid <- get_wormsid(taxa$query)
+#taxa$wormsid <- get_wormsid(taxa$query, ask = FALSE)
+
+#table(!is.na(taxa$wormsid))
+taxa %>%
+  arrange(!is.na(wormsid), GenusSpecies) %>%
+  datatable()
+```
+
+## Format table for Darwin Core
+
+```{r}
+#table(d$Sieve_mm)
+#table(d$Core_area_sq_m)
+
+obs <- d %>%
+  select(StationID, DateSampled, GenusSpecies, SumOfCount) %>%
+  left_join(
+    stations %>%
+      select(StationID, lon, lat), 
+    by="StationID") %>%
+  left_join(
+    taxa %>%
+      select(GenusSpecies, wormsid), 
+    by="GenusSpecies") %>%
+  filter(!is.na(wormsid)) # n: 8,953 -> 4,667
+
+dwc <- obs %>%
+  arrange(DateSampled, StationID, GenusSpecies) %>%
+  mutate(
+    institutionCode = "EPA",
+    collectionCode  = "Combined Till99 & Yaq98 Ferraro Benthic Macrofauna",
+    catalogNumber   = row_number(),
+    occurrenceID    = glue("{institutionCode} - {collectionCode} - {catalogNumber}"), 
+    eventDate       = format(DateSampled, "%y-%m-%d"),
+    occurrenceStatus = "present",
+    basisOfRecord = "HumanObservation") %>%
+  select(
+    # id
+    institutionCode, collectionCode, catalogNumber, occurrenceID,
+    # when
+    eventDate, 
+    # where
+    decimalLongitude = lon, decimalLatitude = lat,
+    # what
+    scientificName = GenusSpecies, scientificNameID = wormsid,
+    occurrenceStatus, basisOfRecord)
+
+write_csv(dwc, dwc_csv)
+#datatable(obs)
+dwc %>%
+  head(100) %>%
+  datatable()
+```
+
