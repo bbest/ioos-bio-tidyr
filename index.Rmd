@@ -63,6 +63,8 @@ datatable(d)
 
 ## Show stations on a map
 
+- out: [data/stations.csv](https://github.com/bbest/ioos-bio-tidyr/blob/gh-pages/data/stations.csv)
+
 ```{r}
 # search UTM 10N at spatialreference.org
 stations <- d %>%
@@ -75,12 +77,16 @@ stations <- d %>%
     lon = st_coordinates(geometry)[,"X"],
     lat = st_coordinates(geometry)[,"Y"])
 
+write_csv(stations, stations_csv)
+
 mapview(stations)
 ```
 
-## Match species to WoRMS id
+## Match species to WoRMS ID
 
 - [rOpenSci | taxize tutorial](https://ropensci.org/tutorials/taxize_tutorial/)
+
+- out: [data/taxa.csv](https://github.com/bbest/ioos-bio-tidyr/blob/gh-pages/data/taxa.csv)
 
 ```{r}
 if (!file_exists(taxa_csv)){
@@ -111,6 +117,9 @@ taxa %>%
 ```
 
 ## Format table for Darwin Core
+
+- out: [data/dwc.csv](https://github.com/bbest/ioos-bio-tidyr/blob/gh-pages/data/dwc.csv)
+
 
 ```{r}
 #table(d$Sieve_mm)
