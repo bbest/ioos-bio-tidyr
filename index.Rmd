@@ -4,7 +4,7 @@ author: "Ben Best"
 date: "2/8/2018"
 output:
   html_document:
-    code_folding: hide
+    code_folding: show
     toc: true
     toc_float: true
 ---
@@ -12,7 +12,28 @@ output:
 ```{r setup, include=FALSE}
 # knit options
 knitr::opts_chunk$set(echo = TRUE, message=F, warning=F)
+```
 
+## Objectives
+
+Dataset [`Combined Till99 & Yaq98 Ferraro Benthic Macrofauna.xlsx`](https://github.com/bbest/ioos-bio-tidyr/raw/gh-pages/data/raw/Combined%20Till99%20%26%20Yaq98%20Ferraro%20Benthic%20Macrofauna.xlsx) from Christina Folger <Folger.Christina@epa.gov>.
+
+Based on [OBIS - Manual - Darwin Core](http://www.iobis.org/manual/darwincore/), at a minimum we need to:
+
+1. Get lat/lon from UTM coordinates.
+1. Get WoRMS ID from taxonomic name.
+1. Create table with required DarwinCore columns.
+
+This document is an Rmarkdown HTML file, which knits chunks of R code with formatted text (in markdown format): 
+
+* [Rmarkdown - Introduction](https://rmarkdown.rstudio.com/lesson-1.html)
+* [Rmarkdown - HTML Document](https://rmarkdown.rstudio.com/html_document_format.html)
+
+You can download a zip of this repository, including the source Rmarkdown (`index.Rmd`) for this document (`index.html`) here:
+
+- https://github.com/bbest/ioos-bio-tidyr/archive/gh-pages.zip
+
+```{r}
 # packages
 library(tidyverse)
 library(fs)
@@ -31,20 +52,6 @@ taxa_csv     <- "data/taxa.csv"
 dwc_csv      <- "data/dwc.csv"
 ```
 
-## Objectives
-
-Dataset [`Combined Till99 & Yaq98 Ferraro Benthic Macrofauna.xlsx`](https://github.com/bbest/ioos-bio-tidyr/raw/gh-pages/data/raw/Combined%20Till99%20%26%20Yaq98%20Ferraro%20Benthic%20Macrofauna.xlsx) from Christina Folger <Folger.Christina@epa.gov>.
-
-Based on [OBIS - Manual - Darwin Core](http://www.iobis.org/manual/darwincore/), at a minimum we need to:
-
-1. Get lat/lon from UTM coordinates.
-1. Get WoRMS ID from taxonomic name.
-1. Create table with required DarwinCore columns.
-
-This document is an Rmarkdown HTML file, which knits chunks of R code with formatted text (in markdown format): 
-
-* [Rmarkdown - Introduction](https://rmarkdown.rstudio.com/lesson-1.html)
-* [Rmarkdown - HTML Document](https://rmarkdown.rstudio.com/html_document_format.html)
 
 ## Read from Excel
 
@@ -89,6 +96,7 @@ mapview(stations)
 - out: [data/taxa.csv](https://github.com/bbest/ioos-bio-tidyr/blob/gh-pages/data/taxa.csv)
 
 ```{r}
+# get_wormsid() is time consuming, so cache output
 if (!file_exists(taxa_csv)){
 
   taxa <- d %>%
@@ -144,7 +152,7 @@ dwc <- obs %>%
     collectionCode  = "Combined Till99 & Yaq98 Ferraro Benthic Macrofauna",
     catalogNumber   = row_number(),
     occurrenceID    = glue("{institutionCode} - {collectionCode} - {catalogNumber}"), 
-    eventDate       = format(DateSampled, "%y-%m-%d"),
+    eventDate       = format(DateSampled, "%y-%m-%d T%h:%m:%s %z"),
     occurrenceStatus = "present",
     basisOfRecord = "HumanObservation") %>%
   select(
