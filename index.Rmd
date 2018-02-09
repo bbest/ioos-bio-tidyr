@@ -61,7 +61,7 @@ d <- read_xlsx(
 datatable(d)
 ```
 
-## Show stations on a map
+## Show Stations on a Map
 
 - out: [data/stations.csv](https://github.com/bbest/ioos-bio-tidyr/blob/gh-pages/data/stations.csv)
 
@@ -82,7 +82,7 @@ write_csv(stations, stations_csv)
 mapview(stations)
 ```
 
-## Match species to WoRMS ID
+## Match Species to WoRMS ID
 
 - [rOpenSci | taxize tutorial](https://ropensci.org/tutorials/taxize_tutorial/)
 
@@ -116,7 +116,7 @@ taxa %>%
   datatable()
 ```
 
-## Format table for Darwin Core
+## Format Table for Darwin Core
 
 - out: [data/dwc.csv](https://github.com/bbest/ioos-bio-tidyr/blob/gh-pages/data/dwc.csv)
 
