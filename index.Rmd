@@ -20,14 +20,16 @@ Dataset [`Combined Till99 & Yaq98 Ferraro Benthic Macrofauna.xlsx`](https://gith
 
 Based on [OBIS - Manual - Darwin Core](http://www.iobis.org/manual/darwincore/), at a minimum we need to:
 
-1. Get lat/lon from UTM coordinates.
+1. Get latitude & longitude from UTM coordinates.
 1. Get WoRMS ID from taxonomic name.
 1. Create table with required DarwinCore columns.
 
-This document is an Rmarkdown HTML file, which knits chunks of R code with formatted text (in markdown format): 
+This document is an Rmarkdown HTML file, which knits chunks of R code with formatted text (in markdown format) to create a reproducible document using data: 
 
 * [Rmarkdown - Introduction](https://rmarkdown.rstudio.com/lesson-1.html)
 * [Rmarkdown - HTML Document](https://rmarkdown.rstudio.com/html_document_format.html)
+
+Expand individual chunks of code used to generate content below by clicking on the "Code" button, or expand all by clicking on "Code" in upper right to "Show All Code".
 
 You can download a zip of this repository, including the source Rmarkdown (`index.Rmd`) for this document (`index.html`) here:
 
