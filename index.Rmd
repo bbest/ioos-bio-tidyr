@@ -29,7 +29,7 @@ This document is an Rmarkdown HTML file, which knits chunks of R code with forma
 * [Rmarkdown - Introduction](https://rmarkdown.rstudio.com/lesson-1.html)
 * [Rmarkdown - HTML Document](https://rmarkdown.rstudio.com/html_document_format.html)
 
-Expand individual chunks of code used to generate content below by clicking on the "Code" button, or expand all by clicking on "Code" in upper right to "Show All Code".
+You can "Hide" or expand "Code" by clicking the right side buttons, or "Hide All Code" / "Show All Code" by clicking the "Code" dropdown in the upper right.
 
 You can download a zip of this repository, including the source Rmarkdown (`index.Rmd`) for this document (`index.html`) here:
 
